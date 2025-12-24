@@ -6,6 +6,7 @@ const interesPrestamo = 0.77;
 
 let continuar = true;
 
+const historialPrestamos = [];
 // Funciones
 
 const datoPrestamo = () => {
@@ -26,8 +27,8 @@ const calculo = (monto, cuotas, interesPrestamo) => {
 
 // Resultado
 
-const resultado = (monto, cuotas, total, cuotaMensual) => {
-    let mensaje = "-RESUMEEN-\n" + "Monto: $" + monto + "\n" + "Cuotas:" + cuotas + "\n" + "Total a pagar: $" + total + "\n" + "Valor de la cuota: $" + cuotaMensual;
+const resultado = (monto, cuotas, total, cuotaMensual, interes) => {
+    let mensaje = "-RESUMEN-\n" + "Monto: $" + monto + "\n" + "Cuotas:" + cuotas + "\n" + "Total a pagar: $" + total + "\n" + "Valor de la cuota: $" + cuotaMensual + "\n" + "Interes generado: $" + interes;
 
     console.log(mensaje);
     alert(mensaje);
@@ -40,13 +41,24 @@ while (continuar) {
     
     let resultados = calculo(datos.monto, datos.cuotas, interesPrestamo);
 
-    resultado(datos.monto, datos.cuotas, resultados.total, resultados.cuotaMensual)
+    resultado(datos.monto, datos.cuotas, resultados.total, resultados.cuotaMensual, resultados.interes)
 
     let  respuesta = confirm("¿Desea simular otro prestamo?");
     if (respuesta == false){
         continuar = false; 
     }
 
+    historialPrestamos.push({
+        monto: datos.monto,
+        cuotas: datos.cuotas,
+        interes: resultados.interes,
+        total: resultados.total
+    })
+
+}
+
+for (historialPrestamo of historialPrestamos){
+    console.log(historialPrestamo)
 }
 
 console.log("Gracias por usar el simulador")
