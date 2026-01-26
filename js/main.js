@@ -22,7 +22,7 @@ function calcularPrestamo(monto, cuotas) {
     };
 }
 
-
+console.log(calcularPrestamo(100000, 12))
 
 
 
