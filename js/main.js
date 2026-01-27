@@ -1,6 +1,6 @@
 const INTERES_PRESTAMO = 0.77; 
 
-let prestamos = [];
+const prestamos = JSON.parse(localStorage.getItem("prestamos")) || [];
 
 const inputMonto = document.getElementById("inputMonto");
 const inputCuotas = document.getElementById("inputCuotas");
@@ -22,6 +22,15 @@ function calcularPrestamo(monto, cuotas) {
     };
 }
 
+function guardarPrestamos() {
+    localStorage.setItem("prestamos", JSON.stringify(prestamos));
+}
+
+function eliminarPrestamo(index) {
+    prestamos.splice(index, 1);
+    guardarPrestamos();
+    renderizarHistorial();
+}
 
 function mostrarResultado(prestamo) {
     contenedorResultado.innerHTML = "";
@@ -47,33 +56,48 @@ function renderizarHistorial() {
         const div = document.createElement("div");
         div.classList.add("item-historial");
 
+        const btnEliminar = document.createElement("button");
+        btnEliminar.textContent = "Eliminar";
+
+        btnEliminar.onclick = () => {
+            eliminarPrestamo(index);
+        };
+
         div.innerHTML = `
         <p><strong>Préstamo ${index + 1}</strong></p>
         <p>Monto: $${prestamo.monto}</p>
         <p>Total: $${prestamo.total}</p>
-        <button data-id="${index}">Eliminar<button>
         `;
 
+        div.appendChild(btnEliminar);
         contenedorHistorial.appendChild(div);
     });
 }
 
+
+
 btnSimular.onclick = () => {
     const monto = Number(inputMonto.value);
-    const cuotas = Number(inputCuotas.value):
+    const cuotas = Number(inputCuotas.value);
 
     if (monto <= 0 || cuotas <= 0) {
+        contenedorResultado.innerHTML = "<p>Ingresá valores válidos</p>";
         return;
     }
 
     const prestamo = calcularPrestamo(monto,cuotas);
     prestamos.push(prestamo);
-
+    guardarPrestamos();
     mostrarResultado(prestamo);
     renderizarHistorial();
+
+    inputMonto.value = "";
+    inputCuotas.value = "";
 };
 
 
+
+renderizarHistorial();
 
 
 
