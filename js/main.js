@@ -1,12 +1,12 @@
 const INTERES_PRESTAMO = 0.77; 
 
-let prestamo = [];
+let prestamos = [];
 
 const inputMonto = document.getElementById("inputMonto");
 const inputCuotas = document.getElementById("inputCuotas");
 const btnSimular = document.getElementById("btnSimular");
-const resultado = document.getElementById("resultado");
-const historial = document.getElementById("historial");
+const contenedorResultado = document.getElementById("resultado");
+const contenedorHistorial = document.getElementById("historial");
 
 function calcularPrestamo(monto, cuotas) {
     const interes = monto * INTERES_PRESTAMO;
@@ -23,7 +23,22 @@ function calcularPrestamo(monto, cuotas) {
 }
 
 
+function mostrarResultado(prestamo) {
+    contenedorResultado.innerHTML = "";
 
+    const div = document.createElement("div");
+    div.classList.add("resultado-prestamo");
+
+    div.innerHTML = `
+        <p><strong>Monto:<strong> $${prestamo.monto}<p>
+        <p><strong>Cuotas:<strong> ${prestamo.cuotas}<p>
+        <p><strong>Interés:<strong> $${prestamo.interes}<p>
+        <p><strong>Total a pagar:<strong> $${prestamo.total}<p>
+        <p><strong>Cuota Mensual:<strong> $${prestamo.cuotaMensual}<p>
+    `;
+
+    contenedorResultado.appendChild(div);
+}
 
 
 
