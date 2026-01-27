@@ -30,17 +30,48 @@ function mostrarResultado(prestamo) {
     div.classList.add("resultado-prestamo");
 
     div.innerHTML = `
-        <p><strong>Monto:<strong> $${prestamo.monto}<p>
-        <p><strong>Cuotas:<strong> ${prestamo.cuotas}<p>
-        <p><strong>Interés:<strong> $${prestamo.interes}<p>
-        <p><strong>Total a pagar:<strong> $${prestamo.total}<p>
-        <p><strong>Cuota Mensual:<strong> $${prestamo.cuotaMensual}<p>
+        <p><strong>Monto:</strong> $${prestamo.monto}</p>
+        <p><strong>Cuotas:</strong> ${prestamo.cuotas}</p>
+        <p><strong>Interés:</strong> $${prestamo.interes}</p>
+        <p><strong>Total a pagar:</strong> $${prestamo.total}</p>
+        <p><strong>Cuota Mensual:</strong> $${prestamo.cuotaMensual}</p>
     `;
 
     contenedorResultado.appendChild(div);
 }
 
+function renderizarHistorial() {
+    contenedorHistorial.innerHTML = "";
 
+    prestamos.forEach((prestamo, index) => {
+        const div = document.createElement("div");
+        div.classList.add("item-historial");
+
+        div.innerHTML = `
+        <p><strong>Préstamo ${index + 1}</strong></p>
+        <p>Monto: $${prestamo.monto}</p>
+        <p>Total: $${prestamo.total}</p>
+        <button data-id="${index}">Eliminar<button>
+        `;
+
+        contenedorHistorial.appendChild(div);
+    });
+}
+
+btnSimular.onclick = () => {
+    const monto = Number(inputMonto.value);
+    const cuotas = Number(inputCuotas.value):
+
+    if (monto <= 0 || cuotas <= 0) {
+        return;
+    }
+
+    const prestamo = calcularPrestamo(monto,cuotas);
+    prestamos.push(prestamo);
+
+    mostrarResultado(prestamo);
+    renderizarHistorial();
+};
 
 
 
