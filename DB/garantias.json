@@ -1,0 +1,25 @@
+[
+    {
+        "id": 1,
+        "tipo": "sin garantia",
+        "multiplicador": 5
+    },
+
+    {
+        "id": 2,
+        "tipo": "recibo de sueldo",
+        "multiplicador": 10
+    },
+
+    {
+        "id": 3,
+        "tipo": "propiedad",
+        "multiplicador": 20
+    },
+
+    {
+        "id": 4,
+        "tipo": "vehiculo",
+        "multiplicador": 15
+    }
+]

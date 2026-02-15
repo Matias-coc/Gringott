@@ -19,10 +19,48 @@
     
     
     <section id="simulador">
-        <h2>Nuevo préstamo</h2>
+        <h2>Datos del cliente</h2>
         <label>
-            Monto del préstamo
-            <input type="number" id="inputMonto" placeholder="100.000">
+            Nombre
+            <input type="text" id="inputNombre" placeholder="Pedro">
+        </label>
+
+        <label>
+            Apellido
+            <input type="text" id="inputApellido" placeholder="Acosta">
+        </label>
+
+        <label>
+            DNI
+            <input type="number" id="inputDNI" placeholder="23209519">
+        </label>
+
+        <label>
+            Ingresos mensuales
+            <input type="number" id="inputIngresos" placeholder="670000">
+        </label>
+
+        <h2>Datos del préstamo</h2>
+
+        <label>
+            Garantía
+            <select id="selectGarantia">
+                <option value="">Seleccione destino</option>
+            </select>
+        </label>
+
+        <label>
+            Destino del préstamo
+            <select id="selectDestino">
+                <option value="">
+                    Seleccione destino
+                </option>
+            </select>
+        </label>
+
+        <label>
+            Monto solicitado
+            <input type="number" id="inputMonto" placeholder="250000">
         </label>
 
         <label>
@@ -30,7 +68,10 @@
             <input type="number" id="inputCuotas" placeholder="12">
         </label>
 
-        <button id="btnSimular">Simular préstamo</button>
+        <button id="btnSimular">
+            Simular préstamo
+        </button>
+
     </section>
 
     <section>

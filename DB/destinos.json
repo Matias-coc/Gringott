@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "nombre": "personal"
+    },
+
+    {
+        "id": 2,
+        "nombre": "auto"
+    },
+
+    {
+        "id": 3,
+        "nombre": "vivienda"
+    },
+
+    {
+        "id": 4,
+        "nombre": "negocio"
+    },
+
+    {
+        "id": 5,
+        "nombre": "educacion"
+    }
+]
