@@ -7,6 +7,70 @@ const inputCuotas = document.getElementById("inputCuotas");
 const btnSimular = document.getElementById("btnSimular");
 const contenedorResultado = document.getElementById("resultado");
 const contenedorHistorial = document.getElementById("historial");
+const selectGarantia = document.getElementById("selectGarantia");
+const selectDestino = document.getElementById("selectDestino")
+
+let garantias = [];
+let destinos= [];
+let tasas = [];
+
+async function cargarGarantias() {
+    try{
+        const response = await fetch("./DB/garantias.json");
+        if (!response.ok) {
+            throw new Error();
+        }
+
+        garantias = await response.json();
+        garantias.forEach(garantia => {
+            const option = document.createElement("option");
+
+            option.value = garantia.id;
+            option.textContent = garantia.nombre;
+
+            selectGarantia.appendChild(option);
+        });
+    } catch {
+        mostrarError("Error al cargar las garantías")
+    } finally {
+
+    }
+}
+
+async function cargarDestinos() {
+    try{
+        const response = await fetch("./DB/destinos.json");
+        if (response.ok) {
+            throw new Error();
+        }
+
+        destinos = await response.json();
+        destinos.forEach(destino => {
+            const option = document.createElement("option");
+
+            option.value = destino.id;
+            option.textContent = destino.nombre;
+
+            selectDestino.appendChild(option);
+        });
+    } catch {
+        mostrarError("Error al cargar los destinos")
+    } finally {}
+    
+}
+
+function mostrarError(mensaje) {
+    const div = document.createElement("div")
+
+    div.className = "error"
+    div.textContent = mensaje;
+
+    document.body.prepend(div);
+
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
 
 function calcularPrestamo(monto, cuotas) {
     const interes = monto * INTERES_PRESTAMO;
@@ -98,6 +162,8 @@ btnSimular.onclick = () => {
 
 
 renderizarHistorial();
+cargarGarantias();
+cargarDestinos();
 
 
 
