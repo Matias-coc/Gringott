@@ -1,4 +1,3 @@
-const INTERES_PRESTAMO = 0.77; 
 
 const prestamos = JSON.parse(localStorage.getItem("prestamos")) || [];
 
@@ -9,10 +8,13 @@ const contenedorResultado = document.getElementById("resultado");
 const contenedorHistorial = document.getElementById("historial");
 const selectGarantia = document.getElementById("selectGarantia");
 const selectDestino = document.getElementById("selectDestino")
+const inputNombre = document.getElementById("inputNombre")
+const inputApellido = document.getElementById("inputApellido")
+const inputDNI = document.getElementById("inputDNI")
+const inputIngresos = document.getElementById("inputIngresos")
 
 let garantias = [];
 let destinos= [];
-let tasas = [];
 
 async function cargarGarantias() {
     try{
@@ -40,7 +42,7 @@ async function cargarGarantias() {
 async function cargarDestinos() {
     try{
         const response = await fetch("./DB/destinos.json");
-        if (response.ok) {
+        if (!response.ok) {
             throw new Error();
         }
 
@@ -72,14 +74,62 @@ function mostrarError(mensaje) {
     }, 3000);
 }
 
-function calcularPrestamo(monto, cuotas) {
-    const interes = monto * INTERES_PRESTAMO;
+function preaprobarPrestamo (datosCliente, datosPrestamo) {
+
+    const garantiaSeleccionada = garantias.find(
+        garantia => garantia.id == datosPrestamo.garantiaId
+    );
+
+    const destinoSeleccionado = destinos.fin(
+        destino => destino.id == datosPrestamo.destinoId
+    );
+
+    if (!garantiaSeleccionada || !destinoSeleccionado) {
+        return {
+            aprobado: false,
+            motivo: "Debe seleccionar garantía y destino"
+        };
+    }
+
+    const montoMaximo = datosCliente.ingresos * garantiaSeleccionada.multiplicador; 
+
+    if (datosPrestamo > montoMaximo) {
+        return{
+            aprobado: false,
+            motivo: "La cantidad dee cuotas supera el máximo permitido"
+        };
+    }
+
+    const interes = datosPrestamo.monto * destinoSeleccionado.tasa;
+    const total = datosPrestamo.monto + interes;
+    const cuotaMensual = total / datosPrestamo.cuotas;
+
+    return {
+        aprobado: true, 
+        cliente: datosCliente,
+
+        prestamo: {
+            monto: datosPrestamo.monto,
+            cuotas: datosPrestamo.cuotas,
+            interes,
+            total,
+            cuotaMensual,
+            tasa: destinoSeleccionado.tasa,
+            destino: destinoSeleccionado.nombre,
+            garantia: garantiaSeleccionada.nombre
+        }
+    };
+}
+
+function calcularPrestamo(monto, cuotas, tasa) {
+    const interes = monto * tasa;
     const total = monto + interes;
     const cuotaMensual = total / cuotas;
 
     return{
         monto,
         cuotas,
+        tasa,
         interes,
         total,
         cuotaMensual,

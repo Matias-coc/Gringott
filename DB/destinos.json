@@ -1,26 +1,36 @@
 [
     {
         "id": 1,
-        "nombre": "personal"
+        "nombre": "personal",
+        "tasa": 0.75,
+        "maxCuotas": 24
     },
 
     {
         "id": 2,
-        "nombre": "auto"
+        "nombre": "auto",
+        "tasa": 0.55,
+        "maxCuotas": 48
     },
 
     {
         "id": 3,
-        "nombre": "vivienda"
+        "nombre": "vivienda",
+        "tasa": 0.40,
+        "maxCuotas": 120
     },
 
     {
         "id": 4,
-        "nombre": "negocio"
+        "nombre": "negocio",
+        "tasa": 0.65,
+        "maxCuotas": 60
     },
 
     {
         "id": 5,
-        "nombre": "educacion"
+        "nombre": "educacion",
+        "tasa": 0.35,
+        "maxCuotas": 36
     }
 ]
