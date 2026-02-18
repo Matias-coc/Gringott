@@ -61,6 +61,28 @@ async function cargarDestinos() {
     
 }
 
+selectDestino.onchange= () => {
+    const destinoSeleccionado = destinos.find(
+        destino => destino.id == selectDestino.value
+    );
+
+    if (!destinoSeleccionado) return;
+
+    inputCuotas.max = destinoSeleccionado.maxCuotas;
+
+    inputCuotas.placeholder = `Máximo ${destinoSeleccionado.maxCuotas} cuotas`;
+
+    inputCuotas.value = "";
+};
+
+inputCuotas.oninput = () => {
+    const max = Number(inputCuotas.max);
+
+    if (Number(inputCuotas.value) > max) {
+        inputCuotas.value = max;
+    }
+};
+
 function mostrarError(mensaje) {
     Swal.fire({
         icon: `error`,
@@ -76,7 +98,7 @@ function mostrarExito(resultado) {
         title: `Préstamo aprobado`,
         html: `
             Cliente: ${resultado.cliente.nombre} ${resultado.cliente.apellido}<br>
-            Moonto: $${resultado.prestamo.monto}<br>
+            Monto: $${resultado.prestamo.monto}<br>
             Cuotas: ${resultado.prestamo.cuotas}<br>
             Cuota mensual: $${resultado.prestamo.cuotaMensual.toFixed(2)}
             `,
@@ -222,6 +244,37 @@ function renderizarHistorial() {
             confirmarEliminacion(index);
         };
 
+        const btnDetalle = document.createElement("button");
+        btnDetalle.textContent = "Ver detalle";
+
+        btnDetalle.onclick = () => {
+
+            Swal.fire({
+                title: "Detalle del préstamo",
+                icon: "info",
+                html: `
+                    <p><strong>Cliente:</strong>${item.cliente.nombre} ${item.cliente.apellido}</p>
+                    <p><strong>DNI:</strong>${item.cliente.dni}</p>
+                    <p><strong>Ingresos:</strong>$${item.cliente.ingresos}</p>
+
+                    <hr>
+
+                    <p><strong>Destino:</strong>${item.prestamo.destino}</p>
+                    <p><strong>Grantía:</strong>${item.prestamo.garantia}</p>
+                    <p><strong>Tasa:</strong>${(item.prestamo.tasa * 100).toFixed(2)}%</p>
+
+                    <hr>
+
+                    <p><strong>Monto:</strong>$${item.prestamo.monto}</p>
+                    <p><strong>Interés:</strong>$${item.prestamo.interes.toFixed(2)}</p>
+                    <p><strong>Total:</strong>$${item.prestamo.total.toFixed(2)}</p>
+                    <p><strong>Cuotas:</strong>${item.prestamo.cuotas}</p>
+                    <p><strong>Cuota mensual:</strong>$${item.prestamo.cuotaMensual.toFixed(2)}</p>
+                    `,
+                    confirmBottonText: "Cerrar"
+            });
+        }
+
         div.innerHTML = `
         <p><strong>Préstamo ${index + 1}</strong></p>
         <p><strong>Cliente:</strong>${item.cliente.nombre} ${item.cliente.apellido}</p>
@@ -235,6 +288,7 @@ function renderizarHistorial() {
         `;
 
         div.appendChild(btnEliminar);
+        div.appendChild(btnDetalle);
         contenedorHistorial.appendChild(div);
     });
 }
