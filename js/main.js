@@ -62,16 +62,26 @@ async function cargarDestinos() {
 }
 
 function mostrarError(mensaje) {
-    const div = document.createElement("div")
+    Swal.fire({
+        icon: `error`,
+        title: `error`,
+        text: mensaje,
+        confirmBottonText: `Entendido` 
+    });
+}
 
-    div.className = "error"
-    div.textContent = mensaje;
-
-    document.body.prepend(div);
-
-    setTimeout(() => {
-        div.remove();
-    }, 3000);
+function mostrarExito(resultado) {
+    Swal.fire({
+        icon: `success`,
+        title: `Préstamo aprobado`,
+        html: `
+            Cliente: ${resultado.cliente.nombre} ${resultado.cliente.apellido}<br>
+            Moonto: $${resultado.prestamo.monto}<br>
+            Cuotas: ${resultado.prestamo.cuotas}<br>
+            Cuota mensual: $${resultado.prestamo.cuotaMensual.toFixed(2)}
+            `,
+            confirmButtonText: `Aceptar`
+    });
 }
 
 function preaprobarPrestamo (datosCliente, datosPrestamo) {
@@ -80,7 +90,7 @@ function preaprobarPrestamo (datosCliente, datosPrestamo) {
         garantia => garantia.id == datosPrestamo.garantiaId
     );
 
-    const destinoSeleccionado = destinos.fin(
+    const destinoSeleccionado = destinos.find(
         destino => destino.id == datosPrestamo.destinoId
     );
 
@@ -93,10 +103,17 @@ function preaprobarPrestamo (datosCliente, datosPrestamo) {
 
     const montoMaximo = datosCliente.ingresos * garantiaSeleccionada.multiplicador; 
 
-    if (datosPrestamo > montoMaximo) {
+    if (datosPrestamo.monto > montoMaximo) {
         return{
             aprobado: false,
-            motivo: "La cantidad dee cuotas supera el máximo permitido"
+            motivo: "La cantidad de cuotas supera el máximo permitido"
+        };
+    }
+
+    if (datosPrestamo.cuotas > destinoSeleccionado.maxCuotas){
+        return {
+            aprobado: false,
+            motivo: `Máximo permitido: ${destinoSeleccionado.maxCuotas} cuotas`
         };
     }
 
@@ -140,24 +157,51 @@ function guardarPrestamos() {
     localStorage.setItem("prestamos", JSON.stringify(prestamos));
 }
 
+function confirmarEliminacion(index) {
+    Swal.fire({
+        title: `¿Eliminar préstamo?`,
+        text: `Esta ación no se puede deshacer`,
+        icon: `warning`,
+        showCancelButton: true,
+        confirmButttonText: `Sí, eliminar`,
+        cancelButtontext: `Cancelar`,
+        confirmButtonColor: `#d33`,
+        cancelButtonColor: `#3085d6`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarPrestamo(index);
+
+            Swal.fire({
+                icon: ``,
+                title: ``,
+                text: ``,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
+}
+
 function eliminarPrestamo(index) {
     prestamos.splice(index, 1);
     guardarPrestamos();
     renderizarHistorial();
 }
 
-function mostrarResultado(prestamo) {
+function mostrarResultado(resultado) {
     contenedorResultado.innerHTML = "";
 
     const div = document.createElement("div");
-    div.classList.add("resultado-prestamo");
 
     div.innerHTML = `
-        <p><strong>Monto:</strong> $${prestamo.monto}</p>
-        <p><strong>Cuotas:</strong> ${prestamo.cuotas}</p>
-        <p><strong>Interés:</strong> $${prestamo.interes}</p>
-        <p><strong>Total a pagar:</strong> $${prestamo.total}</p>
-        <p><strong>Cuota Mensual:</strong> $${prestamo.cuotaMensual}</p>
+        <h3>Préstamo aprobado</h3>
+        <p>Cliente: ${resultado.cliente.nombre} ${resultado.cliente.apellido}</p>
+        <p>DNI: ${resultado.cliente.dni}</p>
+        <p>Destino: ${resultado.prestamo.destino}</p>
+        <p>Garantía: ${resultado.prestamo.garantia}</p>
+        <p>Monto: ${resultado.prestamo.monto}</p>
+        <p>Cuotas: ${resultado.prestamo.cuotas}</p>
+        <p>Cuota mensual: ${resultado.prestamo.cuotaMensual}</p>
     `;
 
     contenedorResultado.appendChild(div);
@@ -166,7 +210,8 @@ function mostrarResultado(prestamo) {
 function renderizarHistorial() {
     contenedorHistorial.innerHTML = "";
 
-    prestamos.forEach((prestamo, index) => {
+    prestamos.forEach((item, index) => {
+
         const div = document.createElement("div");
         div.classList.add("item-historial");
 
@@ -174,13 +219,19 @@ function renderizarHistorial() {
         btnEliminar.textContent = "Eliminar";
 
         btnEliminar.onclick = () => {
-            eliminarPrestamo(index);
+            confirmarEliminacion(index);
         };
 
         div.innerHTML = `
         <p><strong>Préstamo ${index + 1}</strong></p>
-        <p>Monto: $${prestamo.monto}</p>
-        <p>Total: $${prestamo.total}</p>
+        <p><strong>Cliente:</strong>${item.cliente.nombre} ${item.cliente.apellido}</p>
+        <p><strong>DNI:</strong>${item.cliente.dni}</p>
+        <p><strong>Destino:</strong>${item.prestamo.destino}</p>
+        <p><strong>Garantía:</strong>${item.prestamo.garantia}</p>
+        <p><strong>Monto:</strong>$${item.prestamo.monto}</p>
+        <p><strong>Total:</strong>$${item.prestamo.total}</p>
+        <p><strong>Cuota mensual:</strong>$${item.prestamo.cuotaMensual.toFixed(2)}</p>
+        <hr>
         `;
 
         div.appendChild(btnEliminar);
@@ -191,19 +242,47 @@ function renderizarHistorial() {
 
 
 btnSimular.onclick = () => {
-    const monto = Number(inputMonto.value);
-    const cuotas = Number(inputCuotas.value);
+    const datosCliente = {
+        nombre: inputNombre.value,
+        apellido: inputApellido.value,
+        dni: inputDNI.value,
+        ingresos: Number(inputIngresos.value)
+    };
 
-    if (monto <= 0 || cuotas <= 0) {
-        contenedorResultado.innerHTML = "<p>Ingresá valores válidos</p>";
+    const datosPrestamo = {
+        garantiaId: selectGarantia.value,
+        destinoId: selectDestino.value,
+        monto: Number(inputMonto.value),
+        cuotas: Number(inputCuotas.value)
+    };
+
+    if (
+        !datosCliente.nombre ||
+        !datosCliente.apellido ||
+        !datosCliente.dni ||
+        datosCliente.ingresos <= 0 ||
+        datosPrestamo.monto <= 0 ||
+        datosPrestamo.cuotas <= 0
+    ) {
+        mostrarError("Complete todos los campos correctamente");
         return;
     }
 
-    const prestamo = calcularPrestamo(monto,cuotas);
-    prestamos.push(prestamo);
+    const resultado = preaprobarPrestamo(datosCliente, datosPrestamo);
+
+    if (!resultado.aprobado) {
+        mostrarError(resultado.motivo);
+        return;
+    }
+
+    prestamos.push(resultado);
     guardarPrestamos();
-    mostrarResultado(prestamo);
+
+    mostrarResultado(resultado);
+
     renderizarHistorial();
+
+    mostrarExito(resultado);
 
     inputMonto.value = "";
     inputCuotas.value = "";
