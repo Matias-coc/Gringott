@@ -106,59 +106,7 @@ function mostrarExito(resultado) {
     });
 }
 
-function preaprobarPrestamo (datosCliente, datosPrestamo) {
 
-    const garantiaSeleccionada = garantias.find(
-        garantia => garantia.id == datosPrestamo.garantiaId
-    );
-
-    const destinoSeleccionado = destinos.find(
-        destino => destino.id == datosPrestamo.destinoId
-    );
-
-    if (!garantiaSeleccionada || !destinoSeleccionado) {
-        return {
-            aprobado: false,
-            motivo: "Debe seleccionar garantía y destino"
-        };
-    }
-
-    const montoMaximo = datosCliente.ingresos * garantiaSeleccionada.multiplicador; 
-
-    if (datosPrestamo.monto > montoMaximo) {
-        return{
-            aprobado: false,
-            motivo: "La cantidad de cuotas supera el máximo permitido"
-        };
-    }
-
-    if (datosPrestamo.cuotas > destinoSeleccionado.maxCuotas){
-        return {
-            aprobado: false,
-            motivo: `Máximo permitido: ${destinoSeleccionado.maxCuotas} cuotas`
-        };
-    }
-
-    const interes = datosPrestamo.monto * destinoSeleccionado.tasa;
-    const total = datosPrestamo.monto + interes;
-    const cuotaMensual = total / datosPrestamo.cuotas;
-
-    return {
-        aprobado: true, 
-        cliente: datosCliente,
-
-        prestamo: {
-            monto: datosPrestamo.monto,
-            cuotas: datosPrestamo.cuotas,
-            interes,
-            total,
-            cuotaMensual,
-            tasa: destinoSeleccionado.tasa,
-            destino: destinoSeleccionado.nombre,
-            garantia: garantiaSeleccionada.nombre
-        }
-    };
-}
 
 function calcularPrestamo(monto, cuotas, tasa) {
     const interes = monto * tasa;
@@ -175,9 +123,7 @@ function calcularPrestamo(monto, cuotas, tasa) {
     };
 }
 
-function guardarPrestamos() {
-    localStorage.setItem("prestamos", JSON.stringify(prestamos));
-}
+
 
 function confirmarEliminacion(index) {
     Swal.fire({
@@ -191,7 +137,7 @@ function confirmarEliminacion(index) {
         cancelButtonColor: `#3085d6`
     }).then((result) => {
         if (result.isConfirmed) {
-            eliminarPrestamo(index);
+            eliminarPrestamo(prestamos, index);
 
             Swal.fire({
                 icon: ``,
@@ -204,11 +150,7 @@ function confirmarEliminacion(index) {
     });
 }
 
-function eliminarPrestamo(index) {
-    prestamos.splice(index, 1);
-    guardarPrestamos();
-    renderizarHistorial();
-}
+
 
 function mostrarResultado(resultado) {
     contenedorResultado.innerHTML = "";
@@ -322,7 +264,7 @@ btnSimular.onclick = () => {
         return;
     }
 
-    const resultado = preaprobarPrestamo(datosCliente, datosPrestamo);
+    const resultado = preaprobarPrestamo(datosCliente, datosPrestamo, garantias, destinos);
 
     if (!resultado.aprobado) {
         mostrarError(resultado.motivo);
@@ -330,7 +272,7 @@ btnSimular.onclick = () => {
     }
 
     prestamos.push(resultado);
-    guardarPrestamos();
+    guardarPrestamos(prestamos);
 
     mostrarResultado(resultado);
 
